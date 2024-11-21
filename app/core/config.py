@@ -14,10 +14,8 @@ environ.Env.read_env(BASE_DIR / '.env.local')
 
 DATABASE_URL = os.getenv("DATABASE_URL", 'postgresql://admin:secret@localhost:5432/postgres')
 
-# create Engine instance with connected database
 engine = create_engine(DATABASE_URL)
 
-# sessions for managing database
 Session = sessionmaker(autoflush=False, bind=engine)
 
 BaseModel = declarative_base()
