@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Tariffs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    h1 {
+      color: #555;
+    }
+    form {
+      padding: 2em;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 1em;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+    input[type="file"] {
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button {
+      padding: 0.75em 1.5em;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #response {
+      margin-top: 1em;
+      padding: 1em;
+      border-radius: 4px;
+      display: none;
+    }
+    #response.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    #response.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload Tariff JSON</h1>
+  <form id="uploadForm">
+    <div class="form-group">
+      <label for="file">Select JSON File</label>
+      <input type="file" id="file" name="file" accept=".json" required>
+    </div>
+    <button type="submit">Upload</button>
+  </form>
+  <div id="response"></div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const responseDiv = document.getElementById("response");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const fileInput = document.getElementById("file");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        showResponse("Please select a file.", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("http://localhost:8000/api/v0/tariffs/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          showResponse(error.detail || "Failed to upload tariffs.", "error");
+        } else {
+          const result = await response.json();
+          showResponse(result.message || "Tariffs uploaded successfully!", "success");
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        showResponse("An unexpected error occurred.", "error");
+      }
+    });
+
+    function showResponse(message, type) {
+      responseDiv.style.display = "block";
+      responseDiv.textContent = message;
+      responseDiv.className = type;
+    }
+  </script>
+</body>
+</html>

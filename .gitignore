@@ -1,0 +1,4 @@
+app/.env.local
+.idea
+.env.docker
+venv
